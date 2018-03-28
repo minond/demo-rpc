@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"log"
 	"net"
@@ -24,8 +25,8 @@ func (s *server) Search(*gen.SearchRequest, gen.Friends_SearchServer) error {
 	return errors.New("Unimplemented method")
 }
 
-func (s *server) Create(gen.Friends_CreateServer) error {
-	return errors.New("Unimplemented method")
+func (s *server) Create(context.Context, *gen.Friend) (*gen.Ack, error) {
+	return nil, errors.New("Unimplemented method")
 }
 
 func main() {

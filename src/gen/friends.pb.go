@@ -108,7 +108,7 @@ const _ = grpc.SupportPackageIsVersion4
 
 type FriendsClient interface {
 	Search(ctx context.Context, in *SearchRequest, opts ...grpc.CallOption) (Friends_SearchClient, error)
-	Create(ctx context.Context, opts ...grpc.CallOption) (Friends_CreateClient, error)
+	Create(ctx context.Context, in *Friend, opts ...grpc.CallOption) (*Ack, error)
 }
 
 type friendsClient struct {
@@ -151,45 +151,20 @@ func (x *friendsSearchClient) Recv() (*Friend, error) {
 	return m, nil
 }
 
-func (c *friendsClient) Create(ctx context.Context, opts ...grpc.CallOption) (Friends_CreateClient, error) {
-	stream, err := grpc.NewClientStream(ctx, &_Friends_serviceDesc.Streams[1], c.cc, "/gen.Friends/Create", opts...)
+func (c *friendsClient) Create(ctx context.Context, in *Friend, opts ...grpc.CallOption) (*Ack, error) {
+	out := new(Ack)
+	err := grpc.Invoke(ctx, "/gen.Friends/Create", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &friendsCreateClient{stream}
-	return x, nil
-}
-
-type Friends_CreateClient interface {
-	Send(*Friend) error
-	CloseAndRecv() (*Ack, error)
-	grpc.ClientStream
-}
-
-type friendsCreateClient struct {
-	grpc.ClientStream
-}
-
-func (x *friendsCreateClient) Send(m *Friend) error {
-	return x.ClientStream.SendMsg(m)
-}
-
-func (x *friendsCreateClient) CloseAndRecv() (*Ack, error) {
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	m := new(Ack)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
+	return out, nil
 }
 
 // Server API for Friends service
 
 type FriendsServer interface {
 	Search(*SearchRequest, Friends_SearchServer) error
-	Create(Friends_CreateServer) error
+	Create(context.Context, *Friend) (*Ack, error)
 }
 
 func RegisterFriendsServer(s *grpc.Server, srv FriendsServer) {
@@ -217,46 +192,38 @@ func (x *friendsSearchServer) Send(m *Friend) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func _Friends_Create_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(FriendsServer).Create(&friendsCreateServer{stream})
-}
-
-type Friends_CreateServer interface {
-	SendAndClose(*Ack) error
-	Recv() (*Friend, error)
-	grpc.ServerStream
-}
-
-type friendsCreateServer struct {
-	grpc.ServerStream
-}
-
-func (x *friendsCreateServer) SendAndClose(m *Ack) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func (x *friendsCreateServer) Recv() (*Friend, error) {
-	m := new(Friend)
-	if err := x.ServerStream.RecvMsg(m); err != nil {
+func _Friends_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Friend)
+	if err := dec(in); err != nil {
 		return nil, err
 	}
-	return m, nil
+	if interceptor == nil {
+		return srv.(FriendsServer).Create(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gen.Friends/Create",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FriendsServer).Create(ctx, req.(*Friend))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 var _Friends_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "gen.Friends",
 	HandlerType: (*FriendsServer)(nil),
-	Methods:     []grpc.MethodDesc{},
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Create",
+			Handler:    _Friends_Create_Handler,
+		},
+	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "Search",
 			Handler:       _Friends_Search_Handler,
 			ServerStreams: true,
-		},
-		{
-			StreamName:    "Create",
-			Handler:       _Friends_Create_Handler,
-			ClientStreams: true,
 		},
 	},
 	Metadata: "friends.proto",
@@ -265,17 +232,17 @@ var _Friends_serviceDesc = grpc.ServiceDesc{
 func init() { proto.RegisterFile("friends.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 181 bytes of a gzipped FileDescriptorProto
+	// 179 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x4d, 0x2b, 0xca, 0x4c,
 	0xcd, 0x4b, 0x29, 0xd6, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x4e, 0x4f, 0xcd, 0x53, 0x92,
 	0xe1, 0x62, 0x73, 0x03, 0x8b, 0x0a, 0x09, 0x71, 0xb1, 0xe4, 0x25, 0xe6, 0xa6, 0x4a, 0x30, 0x2a,
 	0x30, 0x6a, 0x70, 0x06, 0x81, 0xd9, 0x4a, 0xea, 0x5c, 0xcc, 0x8e, 0xc9, 0xd9, 0x42, 0x7c, 0x5c,
 	0x4c, 0xf9, 0xd9, 0x60, 0x09, 0x8e, 0x20, 0xa6, 0xfc, 0x6c, 0x21, 0x01, 0x2e, 0xe6, 0xdc, 0xe2,
 	0x74, 0x09, 0x26, 0xb0, 0x4a, 0x10, 0x53, 0x49, 0x99, 0x8b, 0x37, 0x38, 0x35, 0xb1, 0x28, 0x39,
-	0x23, 0x28, 0xb5, 0xb0, 0x34, 0xb5, 0xb8, 0x04, 0x9b, 0x69, 0x46, 0xb1, 0x5c, 0xec, 0x10, 0xbb,
+	0x23, 0x28, 0xb5, 0xb0, 0x34, 0xb5, 0xb8, 0x04, 0x9b, 0x69, 0x46, 0xd1, 0x5c, 0xec, 0x10, 0xbb,
 	0x8a, 0x85, 0x74, 0xb9, 0xd8, 0x20, 0xea, 0x85, 0x84, 0xf4, 0xd2, 0x53, 0xf3, 0xf4, 0x50, 0x34,
-	0x4b, 0x71, 0x83, 0xc5, 0x20, 0x6a, 0x95, 0x18, 0x0c, 0x18, 0x85, 0x94, 0xb9, 0xd8, 0x9c, 0x8b,
-	0x52, 0x13, 0x4b, 0x52, 0x85, 0x90, 0xa5, 0xa4, 0x38, 0xc0, 0x1c, 0xc7, 0xe4, 0x6c, 0x25, 0x06,
-	0x0d, 0xc6, 0x24, 0x36, 0xb0, 0xb7, 0x8c, 0x01, 0x01, 0x00, 0x00, 0xff, 0xff, 0xb3, 0x62, 0xf7,
-	0xb8, 0xe7, 0x00, 0x00, 0x00,
+	0x4b, 0x71, 0x83, 0xc5, 0x20, 0x6a, 0x95, 0x18, 0x0c, 0x18, 0x85, 0x14, 0xb9, 0xd8, 0x9c, 0x8b,
+	0x52, 0x13, 0x4b, 0x52, 0x85, 0x90, 0xa5, 0xa4, 0x38, 0xc0, 0x1c, 0xc7, 0xe4, 0x6c, 0x25, 0x86,
+	0x24, 0x36, 0xb0, 0xa7, 0x8c, 0x01, 0x01, 0x00, 0x00, 0xff, 0xff, 0x8a, 0x53, 0x30, 0xd9, 0xe5,
+	0x00, 0x00, 0x00,
 }

@@ -4,7 +4,7 @@ package gen;
 
 service Friends {
   rpc Search (SearchRequest) returns (stream Friend) {}
-  rpc Create (stream Friend) returns (Ack) {}
+  rpc Create (Friend) returns (Ack) {}
 }
 
 message Friend {

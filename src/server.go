@@ -5,7 +5,7 @@ import (
 	"log"
 	"net"
 
-	pb "github.com/minond/demo-rpc/src/friends"
+	gen "github.com/minond/demo-rpc/src/gen"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -15,16 +15,16 @@ const (
 )
 
 var (
-	db = make(map[string]pb.Friend)
+	db = make(map[string]gen.Friend)
 )
 
 type server struct{}
 
-func (s *server) Search(*pb.SearchRequest, pb.Friends_SearchServer) error {
+func (s *server) Search(*gen.SearchRequest, gen.Friends_SearchServer) error {
 	return errors.New("Unimplemented method")
 }
 
-func (s *server) Create(pb.Friends_CreateServer) error {
+func (s *server) Create(gen.Friends_CreateServer) error {
 	return errors.New("Unimplemented method")
 }
 
@@ -36,7 +36,7 @@ func main() {
 	}
 
 	serv := grpc.NewServer()
-	pb.RegisterFriendsServer(serv, &server{})
+	gen.RegisterFriendsServer(serv, &server{})
 	reflection.Register(serv)
 
 	if err := serv.Serve(conn); err != nil {

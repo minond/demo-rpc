@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package friends;
+package gen;
 
 service Friends {
   rpc Search (SearchRequest) returns (stream Friend) {}

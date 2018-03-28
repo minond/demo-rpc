@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+service Friends {
+  rpc Search (SearchRequest) returns (stream Friend) {}
+  rpc Create (stream Friend) returns (Ack) {}
+}
+
+message Friend {
+  string name = 1;
+}
+
+message Ack {
+  bool ok = 1;
+  string msg = 2;
+}
+
+message SearchRequest {
+  string name = 1;
+}

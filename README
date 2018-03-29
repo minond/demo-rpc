@@ -5,17 +5,22 @@ Run `go run src/server.go` to start the RPC server and `go run src/client.go` to
     $ go run src/client.go -create "Marcos"
     Ok: true
     Message: Created id:1 name:"Marcos"
+
     $ go run src/client.go -create "Hannah"
     Ok: true
     Message: Created id:2 name:"Hannah"
+
     $ go run src/client.go -create "Ryan"
     Ok: true
     Message: Created id:3 name:"Ryan"
+
     $ go run src/client.go -search "y"
     Result: id:3 name:"Ryan"
+
     $ go run src/client.go -search "n"
     Result: id:2 name:"Hannah"
     Result: id:3 name:"Ryan"
+
     $ go run src/client.go -search "a"
     Result: id:2 name:"Hannah"
     Result: id:3 name:"Ryan"

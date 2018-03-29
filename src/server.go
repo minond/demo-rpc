@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strings"
 
 	gen "github.com/minond/demo-rpc/src/gen"
 	"google.golang.org/grpc"
@@ -23,8 +24,14 @@ var (
 
 type server struct{}
 
-func (s *server) Search(*gen.SearchRequest, gen.Friends_SearchServer) error {
-	return errors.New("Unimplemented method")
+func (s *server) Search(search *gen.SearchRequest, server gen.Friends_SearchServer) error {
+	for _, friend := range friendsDb {
+		if strings.Contains(friend.Name, search.Name) {
+			server.Send(&friend)
+		}
+	}
+
+	return nil
 }
 
 func (s *server) Create(ctx context.Context, friend *gen.Friend) (*gen.Ack, error) {

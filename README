@@ -1,6 +1,5 @@
-Playing around with RPC services, specifically, gRPC. This demo creates a simple service for managing your friends.
+Playing around with RPC services, specifically, gRPC. This demo creates a simple service for managing your friends. Run `go run src/server.go` to start the RPC server and `go run src/client.go` to make calls. Run `go run src/client.go -help` to see what you can do with the client. To re-build the code, just run `make build`. Here's an of how the client works:
 
-Run `go run src/server.go` to start the RPC server and `go run src/client.go` to make calls. Run `go run src/client.go -help` to see what you can do with the client. To re-build the code, just run `make build`. Here's an of how the client works:
 
     $ go run src/client.go -create "Marcos"
     Ok: true

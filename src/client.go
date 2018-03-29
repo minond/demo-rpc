@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 
 	gen "github.com/minond/demo-rpc/src/gen"
@@ -15,7 +16,8 @@ const (
 )
 
 var (
-	create = flag.String("create", "", "Name of your new friend")
+	create = flag.String("create", "", "Name of your new friend.")
+	search = flag.String("search", "", "Search for friends by their names.")
 )
 
 func init() {
@@ -23,7 +25,7 @@ func init() {
 }
 
 func main() {
-	if *create == "" {
+	if *create == "" && *search == "" {
 		fmt.Println("Usage:")
 		flag.PrintDefaults()
 		return
@@ -38,11 +40,38 @@ func main() {
 	defer conn.Close()
 	client := gen.NewFriendsClient(conn)
 	ctx := context.Background()
-	friend := gen.Friend{Name: *create}
 
-	if x, err := client.Create(ctx, &friend); err != nil {
-		log.Printf("Error making RPC call: %v\n", err)
-	} else {
-		fmt.Printf("%+q\n", x)
+	if *create != "" {
+		friend := gen.Friend{Name: *create}
+
+		if ack, err := client.Create(ctx, &friend); err != nil {
+			log.Printf("Error making RPC call: %v\n", err)
+		} else if ack != nil {
+			fmt.Printf("Ok: %t\n", ack.Ok)
+			fmt.Printf("Message: %s\n", ack.Msg)
+		} else {
+			log.Println("Did not get an ack back from all to Create")
+		}
+	} else if *search != "" {
+		search := gen.SearchRequest{Name: *search}
+
+		if res, err := client.Search(ctx, &search); err != nil {
+			log.Printf("Error making RPC call: %v\n", err)
+		} else {
+			for {
+				friend, err := res.Recv()
+
+				if err == io.EOF {
+					break
+				} else if err != nil {
+					log.Printf("Error making RPC call: %v\n", err)
+					break
+				} else if friend == nil {
+					break
+				} else {
+					fmt.Printf("Result: %v\n", friend)
+				}
+			}
+		}
 	}
 }

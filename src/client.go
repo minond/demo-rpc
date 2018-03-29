@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 
@@ -13,7 +14,21 @@ const (
 	address = "localhost:50007"
 )
 
+var (
+	create = flag.String("create", "", "Name of your new friend")
+)
+
+func init() {
+	flag.Parse()
+}
+
 func main() {
+	if *create == "" {
+		fmt.Println("Usage:")
+		flag.PrintDefaults()
+		return
+	}
+
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
 
 	if err != nil {
@@ -23,7 +38,7 @@ func main() {
 	defer conn.Close()
 	client := gen.NewFriendsClient(conn)
 	ctx := context.Background()
-	friend := gen.Friend{Name: "Marcos"}
+	friend := gen.Friend{Name: *create}
 
 	if x, err := client.Create(ctx, &friend); err != nil {
 		log.Printf("Error making RPC call: %v\n", err)

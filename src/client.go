@@ -23,9 +23,9 @@ func main() {
 	defer conn.Close()
 	client := gen.NewFriendsClient(conn)
 	ctx := context.Background()
-	// friend := gen.Friend{}
+	friend := gen.Friend{Name: "Marcos"}
 
-	if x, err := client.Create(ctx); err != nil {
+	if x, err := client.Create(ctx, &friend); err != nil {
 		log.Printf("Error making RPC call: %v\n", err)
 	} else {
 		fmt.Printf("%+q\n", x)

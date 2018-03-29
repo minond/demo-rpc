@@ -8,7 +8,8 @@ service Friends {
 }
 
 message Friend {
-  string name = 1;
+  uint32 id = 1;
+  string name = 2;
 }
 
 message Ack {

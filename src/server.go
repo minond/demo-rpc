@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"net"
 
@@ -16,7 +17,8 @@ const (
 )
 
 var (
-	db = make(map[string]gen.Friend)
+	nextId    uint32 = 0
+	friendsDb        = make(map[uint32]gen.Friend)
 )
 
 type server struct{}
@@ -25,8 +27,21 @@ func (s *server) Search(*gen.SearchRequest, gen.Friends_SearchServer) error {
 	return errors.New("Unimplemented method")
 }
 
-func (s *server) Create(context.Context, *gen.Friend) (*gen.Ack, error) {
-	return nil, errors.New("Unimplemented method")
+func (s *server) Create(ctx context.Context, friend *gen.Friend) (*gen.Ack, error) {
+	if friend.Id != 0 {
+		return nil, errors.New("Cannot create a new friend that has an Id.")
+	}
+
+	nextId += 1
+	friend.Id = nextId
+	friendsDb[nextId] = *friend
+
+	ack := &gen.Ack{
+		Ok:  true,
+		Msg: fmt.Sprintf("Created %v", friend),
+	}
+
+	return ack, nil
 }
 
 func main() {
